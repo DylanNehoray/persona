@@ -116,7 +116,11 @@ class RandomizeParticleGenerator(
             }
             SourceEdge.BOTTOM -> {
                 Pair(
-                    (getRandomX() - halfWidth).toFloat(),
+                    if (initialConstraints.isNullOrEmpty()) {
+                        (getRandomX() - halfWidth).toFloat()
+                    } else {
+                        (getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.width) - halfWidth
+                    },
                     dimension.height.toFloat()
                 )
             }
