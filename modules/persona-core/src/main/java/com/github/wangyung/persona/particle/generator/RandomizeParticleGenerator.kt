@@ -1,9 +1,11 @@
 package com.github.wangyung.persona.particle.generator
 
+import android.util.Log
 import android.util.Size
 import com.github.wangyung.persona.particle.Instinct
 import com.github.wangyung.persona.particle.MutableParticle
 import com.github.wangyung.persona.particle.ParticleShape
+import com.github.wangyung.persona.particle.fastForEach
 import com.github.wangyung.persona.particle.generator.parameter.InitialConstraints
 import com.github.wangyung.persona.particle.generator.parameter.ParticleGeneratorParameters
 import com.github.wangyung.persona.particle.generator.parameter.SourceEdge
@@ -30,11 +32,12 @@ class RandomizeParticleGenerator(
         particle.x = x
         particle.y = y
         val shape = particle.instinct.shape
+        val scale = getRandomFloatSafely(parameters.scaleRange)
         val particleInstinct = Instinct(
             speed = getRandomFloatSafely(parameters.speedRange),
             angle = getRandomFloatSafely(parameters.angleRange),
-            scaleX = getRandomFloatSafely(parameters.scaleRange),
-            scaleY = getRandomFloatSafely(parameters.scaleRange),
+            scaleX = scale,//getRandomFloatSafely(parameters.scaleRange),
+            scaleY = scale,//getRandomFloatSafely(parameters.scaleRange),
             width = getRandomWidth(shape),
             height = getRandomHeight(shape),
             xRotationalSpeed = getRandomFloatSafely(parameters.xRotationalSpeedRange),
@@ -44,6 +47,9 @@ class RandomizeParticleGenerator(
         particle.rotation = 0f
         particle.xRotationWidth = particleInstinct.shape.width.toFloat()
         particle.instinct = particleInstinct
+        particle.alpha = 1f
+        particle.scaleX = scale
+        particle.scaleY = scale
     }
 
     override fun createParticles(): List<MutableParticle> {
@@ -56,15 +62,16 @@ class RandomizeParticleGenerator(
 
     private fun createParticle(randomizeInitialXY: Boolean): MutableParticle {
         val shape = shapeProvider.provide()
+        val scale = getRandomFloatSafely(parameters.scaleRange)
         val instinct = Instinct(
             width = getRandomWidth(shape),
             height = getRandomHeight(shape),
-            speed = getRandomFloatSafely(parameters.speedRange),
+            speed = getRandomFloatSafely(parameters.speedRange)*2,
             angle = getRandomFloatSafely(parameters.angleRange),
             xRotationalSpeed = getRandomFloatSafely(parameters.xRotationalSpeedRange),
             zRotationalSpeed = getRandomFloatSafely(parameters.zRotationalSpeedRange),
-            scaleX = getRandomFloatSafely(parameters.scaleRange),
-            scaleY = getRandomFloatSafely(parameters.scaleRange),
+            scaleX = scale,//getRandomFloatSafely(parameters.scaleRange),
+            scaleY = scale,//getRandomFloatSafely(parameters.scaleRange),
             startOffset = Random.nextInt(parameters.startOffsetRange),
             shape = shape
         )
@@ -79,6 +86,7 @@ class RandomizeParticleGenerator(
             y = y,
             scaleX = instinct.scaleX,
             scaleY = instinct.scaleY,
+            alpha = 0f,
             instinct = instinct,
         )
     }
@@ -109,17 +117,18 @@ class RandomizeParticleGenerator(
                     if (initialConstraints.isNullOrEmpty()) {
                         (getRandomX() - halfWidth).toFloat()
                     } else {
-                        (getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.width) - halfWidth
+                        (getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.width)
                     },
                     -halfHeight.toFloat()
                 )
             }
             SourceEdge.BOTTOM -> {
                 Pair(
+                    //(getRandomX() - halfWidth).toFloat(),
                     if (initialConstraints.isNullOrEmpty()) {
                         (getRandomX() - halfWidth).toFloat()
                     } else {
-                        (getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.width) - halfWidth
+                        (getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.width)
                     },
                     dimension.height.toFloat()
                 )
@@ -130,7 +139,7 @@ class RandomizeParticleGenerator(
                     if (initialConstraints == null) {
                         (getRandomY() - halfHeight).toFloat()
                     } else {
-                        getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.height - halfHeight
+                        getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.height
                     }
                 )
             }
@@ -138,6 +147,20 @@ class RandomizeParticleGenerator(
                 Pair(
                     dimension.width.toFloat(),
                     (getRandomY() - halfHeight).toFloat()
+                )
+            }
+            SourceEdge.CUSTOM -> {
+                Pair(
+                    if (initialConstraints.isNullOrEmpty()) {
+                        (getRandomX() - halfWidth).toFloat()
+                    } else {
+                        (getRandomFloatSafely(initialConstraints[0].limitRange) * dimension.width)
+                    },
+                    if (initialConstraints.isNullOrEmpty() || initialConstraints.size < 2) {
+                        (getRandomY() - halfHeight).toFloat()
+                    } else {
+                        (getRandomFloatSafely(initialConstraints[1].limitRange) * dimension.height)
+                    }
                 )
             }
         }

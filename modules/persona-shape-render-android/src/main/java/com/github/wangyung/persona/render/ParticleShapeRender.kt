@@ -1,5 +1,6 @@
 package com.github.wangyung.persona.render
 
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -7,10 +8,12 @@ import androidx.compose.ui.graphics.NativePaint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.toOffset
 import com.github.wangyung.persona.particle.Particle
 
 private val debugBorderStroke = Stroke(width = 1f)
@@ -83,13 +86,20 @@ fun Particle.drawPath(
 }
 
 fun Particle.drawImage(drawScope: DrawScope, imageShape: ComposeParticleShape.Image) {
-    val topLeft = IntOffset((x - instinct.width / 2).toInt(), (y - instinct.height / 2).toInt())
-    drawScope.drawImage(
-        image = imageShape.image,
-        dstOffset = topLeft,
-        dstSize = IntSize(instinct.width, instinct.height),
-        colorFilter = imageShape.colorFilter
-    )
+    //val topLeft = IntOffset((x - instinct.width / 2).toInt(), (y - instinct.height / 2).toInt())
+    val w = instinct.width*scaleX
+    val h = instinct.height*scaleY
+    val topLeft = IntOffset((x - w / 2).toInt(), (y - h / 2).toInt())
+    drawScope.rotate(rotation, pivot = Offset(x,y)) {
+        drawScope.drawImage(
+            image = imageShape.image,
+            dstOffset = topLeft,
+            dstSize = IntSize(w.toInt(), h.toInt()),
+            colorFilter = imageShape.colorFilter,
+            alpha = alpha,
+        )
+    }
+
 }
 
 fun Particle.drawRectangle(drawScope: DrawScope, rectangleShape: ComposeParticleShape.Rectangle) {

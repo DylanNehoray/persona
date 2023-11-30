@@ -61,18 +61,19 @@ sealed class ComposeParticleShape {
         val image: ImageBitmap,
         val useImageSize: Boolean = true,
         val colorFilter: ColorFilter? = null,
+        val imageSize: Int = 0
     ) : ComposeParticleShape(), ParticleShape.Image {
         override val width: Int
             get() = if (useImageSize) {
                 image.width
             } else {
-                -1
+                imageSize
             }
         override val height: Int
             get() = if (useImageSize) {
                 image.height
             } else {
-                -1
+                imageSize
             }
     }
 

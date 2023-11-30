@@ -19,7 +19,9 @@ class LinearRotationTransformation : ParticleTransformation {
             if (rotation >= 360) {
                 rotation -= 360
             }
-            scaleY = abs(xRotationWidth / instinct.width - 0.5f) * 2
+            if(instinct.xRotationalSpeed > 0) {
+                scaleY = abs(xRotationWidth / instinct.width - 0.5f) * 2
+            }
         }
     }
 }
