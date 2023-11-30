@@ -12,7 +12,7 @@ def loadLibVersion() {
 def libVersion = loadLibVersion()
 
 android {
-    resourcePrefix "persona"
+    resourcePrefix "persona-core"
 
     compileSdkVersion versions.compileSdkVersion
     defaultConfig {
